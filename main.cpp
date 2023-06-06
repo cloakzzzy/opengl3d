@@ -109,7 +109,7 @@ int main()
     Gen_Quad(vertices, -0.005, 0.015, s, s);
     
     
-    Gen_UVsphere(vertices, 50 , -4.0f, 2.0f, 2.0f, 0.3f);
+    Gen_UVsphere(vertices, 20 , -4.0f, 2.0f, 2.0f, 0.3f);
     //Gen_Ngon(vertices, 10, 0, 0, 0.5, 2);
     
     VBO VBO1(vertices);

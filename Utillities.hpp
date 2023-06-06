@@ -103,13 +103,25 @@ vector<float> Ngonyz(int n, float cx, float cy, float cz, float r, int itr) {
 }
 
 void Gen_UVsphere(vector <float>& vert, int layers, float cx, float cy, float cz, float r) {
-	for (int i = 0; i < layers + 1; i++) {
+	for (int i = 0; i < layers; i++) {
 		vector<float> a = Ngonyz(layers, cx, cy, cz, r, i);
-		float rad = abs(cz - a[2]);
+		float rada = abs(cz - a[2]);
+
+		vector<float> b = Ngonyz(layers, cx, cy, cz, r, i + 1);
+		float radb = abs(cz - b[2]);
+
 		for (int j = 0; j < layers + 1; j++) {
-			vector<float> pa = Ngonxz(layers, cx, a[1], cz, rad, j);
-			vector<float> pb = Ngonxz(layers, cx, a[1], cz, rad, j + 1);
-			Gen_3dtriangle(vert,cx, a[1], cz,pa[0], pa[1], pa[2],pb[0], pb[1], pb[2]);
+			vector<float> pa = Ngonxz(layers, cx, a[1], cz, rada, j);
+			vector<float> pb = Ngonxz(layers, cx, a[1], cz, rada, j + 1);
+
+			vector<float> pc = Ngonxz(layers, cx, b[1], cz, radb, j);
+			vector<float> pd = Ngonxz(layers, cx, b[1], cz, radb, j + 1);
+
+			Gen_3dquad(vert,
+			pd[0],pd[1],pd[2],
+			pc[0],pc[1],pc[2],
+			pb[0],pb[1],pb[2],
+			pa[0],pa[1],pa[2]);
 		}
 	}
 	
