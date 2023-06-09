@@ -91,6 +91,9 @@ public:
         if (pitch < -89.0f)
             pitch = -89.0f;
 
+        yawdir.x = cos(glm::radians(yaw));
+        yawdir.y = sin(glm::radians(yaw));
+
         direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
         direction.y = sin(glm::radians(pitch));
         direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
@@ -107,7 +110,8 @@ public:
         if (y < deadzone and y > -deadzone) {
             y = 0;
         }
-        position -= speed * dt * y  * direction;
+        position.x -= speed * dt * y  * yawdir.x;
+        position.z -= speed * dt * y * yawdir.y;
         position += speed * dt * x * glm::normalize(glm::cross(direction, up));
     }
  

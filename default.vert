@@ -4,6 +4,7 @@ layout (location = 1) in vec2 aTexCoord;
 layout (location = 2) in float Atype;
 
 out vec2 TexCoord;
+out vec3 pos;
 out float type;
 
 uniform mat4 view;
