@@ -21,6 +21,7 @@
 #include <cstdarg>
 #include <iostream>
 #include <vector>
+#include <thread>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -110,12 +111,14 @@ int main()
     Gen_Quad(vertices, -0.015, 0.005, s, s);
     Gen_Quad(vertices, -0.005, 0.015, s, s);
 
+    int acc = 100;
+
     // NOTE: shapes are in order of when i implemented the functions. Going from left to right.
-    Gen_UVsphere(vertices, 50, 0.f, 0.f, 0.f, 2.0f);
-    Gen_Cone(vertices, 50, 5.0f, -2.0f, 0.f, 2.0f, 4.0f);
-    Gen_Doughnut(vertices, 50, 10.0f, 0.f, 0.f, 2.0f, 1.5f);
-    Gen_Cylinder(vertices, 50, 15.0f, -2.0f, 0.f, 2.0f, 4.0f);
-    
+    Gen_UVsphere(vertices, acc, 0.f, 0.f, 0.f, 2.0f);
+    Gen_Cone(vertices, acc, 5.0f, -2.0f, 0.f, 2.0f, 4.0f);
+    Gen_Doughnut(vertices, acc, 10.0f, 0.f, 0.f, 2.0f, 1.5f);
+    Gen_Cylinder(vertices, acc, 15.0f, -2.0f, 0.f, 2.0f, 4.0f);
+
     VBO VBO1(vertices);
     VBO1.Bind();
 
@@ -126,8 +129,8 @@ int main()
     VAO1.LinkVBO(VBO1, 6, 1, 2, 3);
     VAO1.LinkVBO(VBO1, 6, 2, 1, 5);
 
-    Texture texture("grey.jpg");
-    shader.SetInt("texture1", 0);
+    Texture texture("container.jpg");
+    shader.SetInt("texture1", texture.ID);
 
     shader.Use();
     int axesCount;
@@ -172,6 +175,7 @@ int main()
         VAO1.Bind();
 
         glDrawArrays(GL_TRIANGLES, 0, vertices.size() / VAO1.VertexSize);
+
         }, 0.53, 0.81, 0.92);
 
     VBO1.Delete();
@@ -201,7 +205,7 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_RELEASE)
         monoa = 0;
 
-    float cameraSpeed = static_cast<float>(3.0f) * win.DeltaTime;
+    float cameraSpeed = static_cast<float>(5.0f) * win.DeltaTime;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
         cam.position.x += cameraSpeed * cam.yawdir.x;
         cam.position.z += cameraSpeed * cam.yawdir.y;

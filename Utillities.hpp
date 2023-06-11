@@ -122,13 +122,12 @@ void Gen_UVsphere(vector <float>& vert, int acc, float cx, float cy, float cz, f
 	}
 }
 
-void Gen_Doughnut(vector <float>& vert, int acc, float cx, float cy, float cz, float r, float thi) {
+void Gen_Doughnut(vector <float>& vert, int acc, float cx, float cy, float cz, float r, float thickness) {
 	float th = 360.0f / float(acc);
-	thi /= 2.0f;
 	for (int i = 0; i < acc; i++) {
-		vector<float> a = Ngonyz(cx, cy, cz + r - thi, cx, cy, cz + r, th, i);
+		vector<float> a = Ngonyz(cx, cy, cz + r - thickness/2.0f, cx, cy, cz + r, th, i);
 		float rada = abs(a[2] - cz);
-		vector<float> b = Ngonyz(cx, cy, cz + r - thi, cx, cy, cz + r, th, i + 1);
+		vector<float> b = Ngonyz(cx, cy, cz + r - thickness / 2.0f, cx, cy, cz + r, th, i + 1);
 		float radb = b[2] - cz;
 	
 
