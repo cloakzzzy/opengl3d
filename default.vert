@@ -10,13 +10,16 @@ out float type;
 uniform mat4 view;
 uniform mat4 projection;
 uniform vec2 change;
+uniform float xoff;
 
 
 void main()
 {
     vec3 pos = aPos;
+ 
     type = Atype;
     if (type == 1.0f){
+        pos.x += xoff;
         gl_Position = projection * view * vec4(pos, 1.0f);
         if (aTexCoord.y == 1.0f / 456.0f){
             TexCoord = vec2(aTexCoord.x,aTexCoord.y);

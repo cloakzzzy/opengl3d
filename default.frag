@@ -10,7 +10,7 @@ void main()
 {
 	if (type == 1.0f){
 		if (TexCoord.y == 1.0f / 456.0f){
-			FragColor = vec4(TexCoord.x/10.0f,0.f,0.f,1.0f);
+			FragColor = vec4(1.0f,0.f,0.f,1.0f);
 			//return;
 		}
 		FragColor = texture(texture1, TexCoord);
