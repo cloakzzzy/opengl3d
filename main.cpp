@@ -39,6 +39,7 @@ int main()
     glfwSetVersion(3, 3);
     win.Create(SCR_WIDTH, SCR_HEIGHT, "some aim trainer");
 
+    glfwSwapInterval(0);
     glfwSetFramebufferSizeCallback(win.Object, framebuffer_size_callback);
     glfwSetCursorPosCallback(win.Object, mouse_callback);
     glfwSetInputMode(win.Object, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -109,10 +110,12 @@ int main()
     Gen_Quad(vertices, -0.015, 0.005, s, s);
     Gen_Quad(vertices, -0.005, 0.015, s, s);
 
-
-    Gen_UVsphere(vertices, 50, 0.0f, -3.0f, 0.0f, 2.0f);
-    //Gen_Ngon(vertices, 10, 0, 0, 0.5, 2);
-
+    // NOTE: shapes are in order of when i implemented the functions. Going from left to right.
+    Gen_UVsphere(vertices, 50, 0.f, 0.f, 0.f, 2.0f);
+    Gen_Cone(vertices, 50, 5.0f, -2.0f, 0.f, 2.0f, 4.0f);
+    Gen_Doughnut(vertices, 50, 10.0f, 0.f, 0.f, 2.0f, 1.5f);
+    Gen_Cylinder(vertices, 50, 15.0f, -2.0f, 0.f, 2.0f, 4.0f);
+    
     VBO VBO1(vertices);
     VBO1.Bind();
 
@@ -123,7 +126,7 @@ int main()
     VAO1.LinkVBO(VBO1, 6, 1, 2, 3);
     VAO1.LinkVBO(VBO1, 6, 2, 1, 5);
 
-    Texture texture("container.jpg");
+    Texture texture("grey.jpg");
     shader.SetInt("texture1", 0);
 
     shader.Use();
@@ -133,15 +136,16 @@ int main()
     const float speed = 3.f;
     shader.SetVec2("change", 1.0f, float(SCR_WIDTH) / float(SCR_HEIGHT));
 
-
+    float xoff = 0.f;
 
     win.MainLoop([&] {
+        //cout << win.FPS << '\n';
         processInput(win.Object);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture.ID);
         
         shader.Use();
-
+        
         if (glfwJoystickPresent(GLFW_JOYSTICK_1) == 1) {
             axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axesCount);
             buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonCount);
@@ -197,7 +201,7 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_RELEASE)
         monoa = 0;
 
-    float cameraSpeed = static_cast<float>(3.0f * win.DeltaTime);
+    float cameraSpeed = static_cast<float>(3.0f) * win.DeltaTime;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
         cam.position.x += cameraSpeed * cam.yawdir.x;
         cam.position.z += cameraSpeed * cam.yawdir.y;
