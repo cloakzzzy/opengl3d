@@ -95,15 +95,31 @@ vector<float> Ngonyz(float cx, float cy, float cz, float spx, float spy, float s
 	return vect;
 }
 
-void Gen_UVsphere(vector <float>& vert, int layers, float cx, float cy, float cz, float r) {
-	float th = 360.0f / float(layers);
-	for (int i = 0; i < int(ceil(layers / 2)); i++) {
+vector<float> Ngonxy(float cx, float cy, float cz, float spx, float spy, float spz, float deg, int itr) {
+	vector<float> vect;
+	vect.push_back(((spx - cx) * cos(glm::radians(deg * itr)) - sin(glm::radians(deg * itr)) * (spy - cy)) + cx);
+	vect.push_back(((spy - cy) * cos(glm::radians(deg * itr)) - sin(glm::radians(deg * itr)) * (spx - cx)) + cy);
+	vect.push_back(cz);
+	return vect;
+}
+
+vector<float> rotate(float cx, float cy, float cz, float spx, float spy, float spz, float deg) {
+	vector<float> vect;
+	vect.push_back(((spx - cx) * cos(glm::radians(deg)) - sin(glm::radians(deg)) * (spz - cz)) + cx);
+	vect.push_back(cy);
+	vect.push_back(((spz - cz) * cos(glm::radians(deg)) + sin(glm::radians(deg)) * (spx - cx)) + cz);
+	return vect;
+}
+
+void Gen_UVsphere(vector <float>& vert, int acc, float cx, float cy, float cz, float r) {
+	float th = 360.0f / float(acc);
+	for (int i = 0; i < int(ceil(acc / 2)); i++) {
 		vector<float> a = Ngonyz(cx, cy, cz, cx, cy + r, cz, th, i);
 		float rada = (cz - a[2]);
 		vector<float> b = Ngonyz(cx, cy, cz, cx, cy + r, cz, th, i + 1);
 		float radb = (cz - b[2]);
 
-		for (int j = 0; j < layers; j++) {
+		for (int j = 0; j < acc; j++) {
 			vector<float> pa = Ngonxz(cx, a[1], cz, cx, a[1], cz + rada, th, j);
 			vector<float> pb = Ngonxz(cx, a[1], cz, cx, a[1], cz + rada, th, j + 1);
 			vector<float> pc = Ngonxz(cx, b[1], cz, cx, b[1], cz + radb, th, j);
@@ -114,19 +130,53 @@ void Gen_UVsphere(vector <float>& vert, int layers, float cx, float cy, float cz
 	}
 }
 
+void Gen_Doughnut(vector <float>& vert, int acc, float cx, float cy, float cz, float r, float thi) {
+	float th = 360.0f / float(acc);
+	thi /= 2.0f;
+	for (int i = 0; i < acc; i++) {
+		vector<float> a = Ngonyz(cx, cy, cz + r - thi, cx, cy, cz + r, th, i);
+		float rada = abs(a[2] - cz);
+		vector<float> b = Ngonyz(cx, cy, cz + r - thi, cx, cy, cz + r, th, i + 1);
+		float radb = b[2] - cz;
+	
 
+		for (int j = 0; j < acc; j++) {
+			vector<float> pa = Ngonxz(cx, a[1], cz, cx, a[1], cz + rada, th, j);
+			vector<float> pb = Ngonxz(cx, a[1], cz, cx, a[1], cz + rada, th, j + 1);
 
-void Gen_Ngon(vector<float>& vert, int n, float cx,float cy,float r, int itr) {
-	float a = 180.0f / float(n);
-	float sax = cx + r * sin(glm::radians(a));
-	float say = cy + r * cos(glm::radians(a));
-	float sbx = cx - r * sin(glm::radians(a));
-	float sby = cy + r * cos(glm::radians(a));
-	for (int i = 0; i < itr; i++) {
-		Gen_Triangle(vert, cx, cy, 
-			(sax - cx) * cos(glm::radians((float)360 / n * i)) - (say - cx) * sin(glm::radians((float)360 / n * i)) + cx,
-			(say - cy) * cos(glm::radians((float)360 / n * i)) + (sax - cy) * sin(glm::radians((float)360 / n * i)) + cy,
-			(sbx - cx) * cos(glm::radians((float)360 / n * i)) - (sby - cx) * sin(glm::radians((float)360 / n * i)) + cx,
-			(sby - cy) * cos(glm::radians((float)360 / n * i)) + (sbx - cy) * sin(glm::radians((float)360 / n * i) + cy));
+			vector<float> pc = Ngonxz(cx, b[1], cz, cx, b[1], cz + radb, th, j);
+			vector<float> pd = Ngonxz(cx, b[1], cz, cx, b[1], cz + radb, th, j + 1);
+
+			//Gen_3dtriangle(vert, cx, cy, cz, pa[0], pa[1], pa[2], pb[0], pb[1], pb[2]);
+			Gen_3dquad(vert, pd[0], pd[1], pd[2], pc[0], pc[1], pc[2], pb[0], pb[1], pb[2], pa[0], pa[1], pa[2]);
+
+		}
 	}
 }
+
+void Gen_Cone(vector<float>& vert, int acc, float cx, float cy, float cz, float r, float h) {
+	float th = 360.0f / float(acc);
+	for (int i = 0; i < acc; i++) {
+		vector<float> pa = Ngonxz(cx, cy, cz, cx, cy, cz + r, th, i);
+		vector<float> pb = Ngonxz(cx, cy, cz, cx, cy, cz + r, th, i + 1);
+
+		Gen_3dtriangle(vert, pa[0], pa[1], pa[2], pb[0], pb[1], pb[2], cx, cy + h, cz);
+		Gen_3dtriangle(vert, pa[0], pa[1], pa[2], pb[0], pb[1], pb[2], cx, cy, cz);
+
+	}
+}
+
+void Gen_Cylinder(vector<float>& vert, int acc, float cx, float cy, float cz, float r, float h) {
+	float th = 360.0f / float(acc);
+	for (int i = 0; i < acc; i++) {
+		vector<float> pa = Ngonxz(cx, cy, cz, cx, cy, cz + r, th, i);
+		vector<float> pb = Ngonxz(cx, cy, cz, cx, cy, cz + r, th, i + 1);
+
+		Gen_3dquad(vert, pb[0], pb[1] + h, pb[2], pa[0], pa[1] + h, pa[2], pb[0], pb[1], pb[2],pa[0], pa[1], pa[2]);
+
+		Gen_3dtriangle(vert, pa[0], pa[1], pa[2], pb[0], pb[1], pb[2], cx, cy, cz);
+		Gen_3dtriangle(vert, pa[0], pa[1] + h, pa[2], pb[0], pb[1] + h, pb[2], cx, cy + h, cz);
+		
+	}
+}
+
