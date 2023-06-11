@@ -103,14 +103,6 @@ vector<float> Ngonxy(float cx, float cy, float cz, float spx, float spy, float s
 	return vect;
 }
 
-vector<float> rotate(float cx, float cy, float cz, float spx, float spy, float spz, float deg) {
-	vector<float> vect;
-	vect.push_back(((spx - cx) * cos(glm::radians(deg)) - sin(glm::radians(deg)) * (spz - cz)) + cx);
-	vect.push_back(cy);
-	vect.push_back(((spz - cz) * cos(glm::radians(deg)) + sin(glm::radians(deg)) * (spx - cx)) + cz);
-	return vect;
-}
-
 void Gen_UVsphere(vector <float>& vert, int acc, float cx, float cy, float cz, float r) {
 	float th = 360.0f / float(acc);
 	for (int i = 0; i < int(ceil(acc / 2)); i++) {
