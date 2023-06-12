@@ -48,7 +48,7 @@ void Gen_3dtriangle(vector <float>& vert,
 	vert.push_back(ay);
 	vert.push_back(az);
 
-	vert.push_back(bz);
+	vert.push_back(bx);
 	vert.push_back(1.0f / 456.0f);
 	vert.push_back(1.0f);
 
@@ -56,7 +56,7 @@ void Gen_3dtriangle(vector <float>& vert,
 	vert.push_back(by);
 	vert.push_back(bz);
 
-	vert.push_back(bz);
+	vert.push_back(bx);
 	vert.push_back(1.0f / 456.0f);
 	vert.push_back(1.0f);
 
@@ -64,7 +64,7 @@ void Gen_3dtriangle(vector <float>& vert,
 	vert.push_back(cy);
 	vert.push_back(cz);
 
-	vert.push_back(bz);
+	vert.push_back(bx);
 	vert.push_back(1.0f / 456.0f);
 	vert.push_back(1.0f);
 }
@@ -130,15 +130,12 @@ void Gen_Doughnut(vector <float>& vert, int acc, float cx, float cy, float cz, f
 		vector<float> b = Ngonyz(cx, cy, cz + r - thickness / 2.0f, cx, cy, cz + r, th, i + 1);
 		float radb = b[2] - cz;
 	
-
 		for (int j = 0; j < acc; j++) {
 			vector<float> pa = Ngonxz(cx, a[1], cz, cx, a[1], cz + rada, th, j);
 			vector<float> pb = Ngonxz(cx, a[1], cz, cx, a[1], cz + rada, th, j + 1);
-
 			vector<float> pc = Ngonxz(cx, b[1], cz, cx, b[1], cz + radb, th, j);
 			vector<float> pd = Ngonxz(cx, b[1], cz, cx, b[1], cz + radb, th, j + 1);
 
-			//Gen_3dtriangle(vert, cx, cy, cz, pa[0], pa[1], pa[2], pb[0], pb[1], pb[2]);
 			Gen_3dquad(vert, pd[0], pd[1], pd[2], pc[0], pc[1], pc[2], pb[0], pb[1], pb[2], pa[0], pa[1], pa[2]);
 
 		}
@@ -168,6 +165,16 @@ void Gen_Cylinder(vector<float>& vert, int acc, float cx, float cy, float cz, fl
 		Gen_3dtriangle(vert, pa[0], pa[1], pa[2], pb[0], pb[1], pb[2], cx, cy, cz);
 		Gen_3dtriangle(vert, pa[0], pa[1] + h, pa[2], pb[0], pb[1] + h, pb[2], cx, cy + h, cz);
 		
+	}
+}
+
+void Gen_Ngonxy(vector <float>& vert, int acc, float cx, float cy, float cz, float r) {
+	float th = 360.0f / float(acc);
+	for (int i = 0; i < acc; i++) {
+		vector<float> pa = Ngonxy(cx, cy, cz, cx + r, cy, cz, th, i);
+		vector<float> pb = Ngonxy(cx, cy, cz, cx + r, cy, cz, th, i + 1);
+		
+		Gen_3dtriangle(vert, pa[0], pa[1], pa[2], pb[0], pb[1], pb[2], cx, cy, cz);
 	}
 }
 

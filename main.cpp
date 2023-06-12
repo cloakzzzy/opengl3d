@@ -1,5 +1,5 @@
 #define STB_IMAGE_IMPLEMENTATION
-#include <glew.h>
+#include <GL/glew.h>
 #include <glfw3.h>
 
 #include "libs/glm/glm.hpp"
@@ -25,6 +25,7 @@
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void processInput(GLFWwindow* window);
 
 const unsigned int SCR_WIDTH = 800;
@@ -43,6 +44,7 @@ int main()
     glfwSwapInterval(0);
     glfwSetFramebufferSizeCallback(win.Object, framebuffer_size_callback);
     glfwSetCursorPosCallback(win.Object, mouse_callback);
+    glfwSetMouseButtonCallback(win.Object, mouse_button_callback);
     glfwSetInputMode(win.Object, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glewInit();
@@ -56,7 +58,7 @@ int main()
     float th = 0.005;
 
 
-    vector<float> vertices = {
+    vector <float> vertices = {
         /*
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 1.0f,
          0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 1.0f,
@@ -111,13 +113,15 @@ int main()
     Gen_Quad(vertices, -0.015, 0.005, s, s);
     Gen_Quad(vertices, -0.005, 0.015, s, s);
 
-    int acc = 100;
+    int acc = 50;
 
     // NOTE: shapes are in order of when i implemented the functions. Going from left to right.
-    Gen_UVsphere(vertices, acc, 0.f, 0.f, 0.f, 2.0f);
-    Gen_Cone(vertices, acc, 5.0f, -2.0f, 0.f, 2.0f, 4.0f);
-    Gen_Doughnut(vertices, acc, 10.0f, 0.f, 0.f, 2.0f, 1.5f);
-    Gen_Cylinder(vertices, acc, 15.0f, -2.0f, 0.f, 2.0f, 4.0f);
+    Gen_Ngonxy(vertices, acc, 0.f, 0.f, 0.f, 2.0f);
+    Gen_UVsphere(vertices, acc, 5.0f, 0.f, 0.f, 2.0f);
+    Gen_Cone(vertices, acc, 10.0f, -2.0f, 0.f, 2.0f, 4.0f);
+    Gen_Doughnut(vertices, acc, 15.0f, 0.f, 0.f, 2.0f, 1.5f);
+    Gen_Cylinder(vertices, acc, 20.0f, -2.0f, 0.f, 2.0f, 4.0f);
+
 
     VBO VBO1(vertices);
     VBO1.Bind();
@@ -140,9 +144,10 @@ int main()
     shader.SetVec2("change", 1.0f, float(SCR_WIDTH) / float(SCR_HEIGHT));
 
     float xoff = 0.f;
-
+    processInput(win.Object);
+    
     win.MainLoop([&] {
-        //cout << win.FPS << '\n';
+        
         processInput(win.Object);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture.ID);
@@ -170,8 +175,7 @@ int main()
 
         shader.SetMat4("projection", glm::value_ptr(cam.GetProjection()));
         shader.SetMat4("view", glm::value_ptr(cam.GetView()));
-
-
+        
         VAO1.Bind();
 
         glDrawArrays(GL_TRIANGLES, 0, vertices.size() / VAO1.VertexSize);
@@ -242,4 +246,14 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
     if (toggle == true) {
         cam.Mouse_SetLookAt(xposIn, yposIn, 10);
     }
+}
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+       
+    
+    }
+
+        
 }
