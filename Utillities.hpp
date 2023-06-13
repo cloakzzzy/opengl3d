@@ -79,6 +79,7 @@ void Gen_3dquad(vector <float>& vert,
 	Gen_3dtriangle(vert, bx, by, bz, cx, cy, cz, dx, dy, dz);
 }
 
+//circles
 vector<float> Ngonxz(float cx, float cy, float cz, float spx, float spy, float spz, float deg, int itr) {
 	vector<float> vect;
 	vect.push_back(((spx - cx) * cos(glm::radians(deg * itr)) - sin(glm::radians(deg * itr)) * (spz - cz)) + cx);
@@ -98,8 +99,33 @@ vector<float> Ngonyz(float cx, float cy, float cz, float spx, float spy, float s
 vector<float> Ngonxy(float cx, float cy, float cz, float spx, float spy, float spz, float deg, int itr) {
 	vector<float> vect;
 	vect.push_back(((spx - cx) * cos(glm::radians(deg * itr)) - sin(glm::radians(deg * itr)) * (spy - cy)) + cx);
-	vect.push_back(((spy - cy) * cos(glm::radians(deg * itr)) - sin(glm::radians(deg * itr)) * (spx - cx)) + cy);
+	vect.push_back(((spy - cy) * cos(glm::radians(deg * itr)) + sin(glm::radians(deg * itr)) * (spx - cx)) + cy);
 	vect.push_back(cz);
+	return vect;
+}
+
+//ovals 
+vector<float> Ngonxy(float cx, float cy, float cz, float spxa, float spya, float spza, float spxb, float spyb, float spzb,float deg, int itr) {
+	vector<float> vect;
+	vect.push_back(((spxa - cx) * cos(glm::radians(deg * itr)) - sin(glm::radians(deg * itr)) * (spya - cy)) + cx);
+	vect.push_back(((spyb - cy) * cos(glm::radians(deg * itr)) + sin(glm::radians(deg * itr)) * (spxb - cx)) + cy);
+	vect.push_back(cz);
+	return vect;
+}
+
+vector<float> Ngonxz(float cx, float cy, float cz,float spxa, float spya, float spza,float spxb, float spyb, float spzb,float deg, int itr) {
+	vector<float> vect;
+	vect.push_back(((spxa - cx) * cos(glm::radians(deg * itr)) - sin(glm::radians(deg * itr)) * (spza - cz)) + cx);
+	vect.push_back(cy);
+	vect.push_back(((spzb - cz) * cos(glm::radians(deg * itr)) + sin(glm::radians(deg * itr)) * (spxb - cx)) + cz);
+	return vect;
+}
+
+vector<float> Ngonyz(float cx, float cy, float cz, float spxa, float spya, float spza, float spxb, float spyb, float spzb, float deg, int itr) {
+	vector<float> vect;
+	vect.push_back(cx);
+	vect.push_back(((spya - cy) * cos(glm::radians(deg * itr)) - sin(glm::radians(deg * itr)) * (spza - cz)) + cy);
+	vect.push_back(((spzb - cz) * cos(glm::radians(deg * itr)) + sin(glm::radians(deg * itr)) * (spyb - cy)) + cz);
 	return vect;
 }
 
@@ -168,12 +194,23 @@ void Gen_Cylinder(vector<float>& vert, int acc, float cx, float cy, float cz, fl
 	}
 }
 
+//circle
 void Gen_Ngonxy(vector <float>& vert, int acc, float cx, float cy, float cz, float r) {
 	float th = 360.0f / float(acc);
 	for (int i = 0; i < acc; i++) {
 		vector<float> pa = Ngonxy(cx, cy, cz, cx + r, cy, cz, th, i);
 		vector<float> pb = Ngonxy(cx, cy, cz, cx + r, cy, cz, th, i + 1);
 		
+		Gen_3dtriangle(vert, pa[0], pa[1], pa[2], pb[0], pb[1], pb[2], cx, cy, cz);
+	}
+}
+
+
+void Gen_Ngonxy(vector <float>& vert, int acc, float cx, float cy, float cz, float ra, float rb) {
+	float th = 360.0f / float(acc);
+	for (int i = 0; i < acc; i++) {
+		vector<float> pa = Ngonxy(cx, cy, cz, cx + ra, cy, cz, cx + rb, cy, cz,th, i);
+		vector<float> pb = Ngonxy(cx, cy, cz, cx + ra, cy, cz, cx + rb, cy, cz,th, i + 1);
 		Gen_3dtriangle(vert, pa[0], pa[1], pa[2], pb[0], pb[1], pb[2], cx, cy, cz);
 	}
 }

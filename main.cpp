@@ -107,20 +107,23 @@ int main()
     };
 
     //crosshair
-    Gen_Quad(vertices, -0.005, 0.005, s, s);
-    Gen_Quad(vertices, 0.005, 0.005, s, s);
-    Gen_Quad(vertices, -0.005, -0.005, s, s);
-    Gen_Quad(vertices, -0.015, 0.005, s, s);
-    Gen_Quad(vertices, -0.005, 0.015, s, s);
+    //Gen_Quad(vertices, -0.005, 0.005, s, s);
+    //Gen_Quad(vertices, 0.005, 0.005, s, s);
+    //Gen_Quad(vertices, -0.005, -0.005, s, s);
+    //Gen_Quad(vertices, -0.015, 0.005, s, s);
+    //Gen_Quad(vertices, -0.005, 0.015, s, s);
 
-    int acc = 50;
+    int acc = 40;
 
-    // NOTE: shapes are in order of when i implemented the functions. Going from left to right.
-    Gen_Ngonxy(vertices, acc, 0.f, 0.f, 0.f, 2.0f);
+    // NOTE: shapes are placed in order of when i implemented the functions. Going from left to right.
+
+    Gen_Ngonxy(vertices, acc, 0.f, 0.f, 0.0f, 2.0f);
     Gen_UVsphere(vertices, acc, 5.0f, 0.f, 0.f, 2.0f);
     Gen_Cone(vertices, acc, 10.0f, -2.0f, 0.f, 2.0f, 4.0f);
     Gen_Doughnut(vertices, acc, 15.0f, 0.f, 0.f, 2.0f, 1.5f);
     Gen_Cylinder(vertices, acc, 20.0f, -2.0f, 0.f, 2.0f, 4.0f);
+
+    Gen_Ngonxy(vertices, acc, 0.0f, 0.f, -5.0f, 1.0f, 2.0f);
 
 
     VBO VBO1(vertices);
@@ -145,6 +148,8 @@ int main()
 
     float xoff = 0.f;
     processInput(win.Object);
+
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     
     win.MainLoop([&] {
         
