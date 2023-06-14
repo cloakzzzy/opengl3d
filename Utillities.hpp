@@ -130,12 +130,13 @@ vector<float> Ngonyz(float cx, float cy, float cz, float spxa, float spya, float
 }
 
 void Gen_UVsphere(vector <float>& vert, int acc, float cx, float cy, float cz, float r) {
+	int layers = int(ceil(acc / 2));
 	float th = 360.0f / float(acc);
-	for (int i = 0; i < int(ceil(acc / 2)); i++) {
+	for (int i = 0; i < layers; i++) {
 		vector<float> a = Ngonyz(cx, cy, cz, cx, cy + r, cz, th, i);
-		float rada = (cz - a[2]);
+		float rada = abs(cz - a[2]);
 		vector<float> b = Ngonyz(cx, cy, cz, cx, cy + r, cz, th, i + 1);
-		float radb = (cz - b[2]);
+		float radb = abs(cz - b[2]);
 
 		for (int j = 0; j < acc; j++) {
 			vector<float> pa = Ngonxz(cx, a[1], cz, cx, a[1], cz + rada, th, j);
@@ -150,12 +151,13 @@ void Gen_UVsphere(vector <float>& vert, int acc, float cx, float cy, float cz, f
 
 void Gen_Doughnut(vector <float>& vert, int acc, float cx, float cy, float cz, float r, float thickness) {
 	float th = 360.0f / float(acc);
+
 	for (int i = 0; i < acc; i++) {
-		vector<float> a = Ngonyz(cx, cy, cz + r - thickness/2.0f, cx, cy, cz + r, th, i);
+		vector<float> a = Ngonyz(cx, cy, cz + r - thickness / 2.0f, cx, cy, cz + r, th, i);
 		float rada = abs(a[2] - cz);
 		vector<float> b = Ngonyz(cx, cy, cz + r - thickness / 2.0f, cx, cy, cz + r, th, i + 1);
-		float radb = b[2] - cz;
-	
+		float radb = abs(b[2] - cz);
+		
 		for (int j = 0; j < acc; j++) {
 			vector<float> pa = Ngonxz(cx, a[1], cz, cx, a[1], cz + rada, th, j);
 			vector<float> pb = Ngonxz(cx, a[1], cz, cx, a[1], cz + rada, th, j + 1);
@@ -205,12 +207,12 @@ void Gen_Ngonxy(vector <float>& vert, int acc, float cx, float cy, float cz, flo
 	}
 }
 
-
+//oval
 void Gen_Ngonxy(vector <float>& vert, int acc, float cx, float cy, float cz, float ra, float rb) {
 	float th = 360.0f / float(acc);
 	for (int i = 0; i < acc; i++) {
-		vector<float> pa = Ngonxy(cx, cy, cz, cx + ra, cy, cz, cx + rb, cy, cz,th, i);
-		vector<float> pb = Ngonxy(cx, cy, cz, cx + ra, cy, cz, cx + rb, cy, cz,th, i + 1);
+		vector<float> pa = Ngonxy(cx, cy, cz, cx, cy + ra, cz, cx, cy + rb, cz,th, i);
+		vector<float> pb = Ngonxy(cx, cy, cz, cx, cy + ra, cz, cx, cy + rb, cz,th, i + 1);
 		Gen_3dtriangle(vert, pa[0], pa[1], pa[2], pb[0], pb[1], pb[2], cx, cy, cz);
 	}
 }
