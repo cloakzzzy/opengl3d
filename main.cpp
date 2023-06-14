@@ -122,8 +122,7 @@ int main()
     Gen_Cone(vertices, acc, 10.0f, -2.0f, 0.f, 2.0f, 4.0f);
     Gen_Doughnut(vertices, acc, 15.0f, 0.f, 0.f, 2.0f, 1.5f);
     Gen_Cylinder(vertices, acc, 20.0f, -2.0f, 0.f, 2.0f, 4.0f);
-
-    Gen_Ngonxy(vertices, acc, 0.0f, 0.f, -5.0f, 1.0f, 2.0f);
+    Gen_Ngonxy(vertices, acc, 24.0f, 0.f, 0.0f, 1.0f, 2.0f);
 
 
     VBO VBO1(vertices);
@@ -148,8 +147,6 @@ int main()
 
     float xoff = 0.f;
     processInput(win.Object);
-
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     
     win.MainLoop([&] {
         
@@ -253,12 +250,25 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
     }
 }
 
+double monob = 0;
+bool toggleb = false;
+
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-       
-    
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+        monob += 0.000000001;
+        if (monob == 0.000000001) {
+            toggleb = !toggleb;
+            if (toggleb == false) {
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            }
+            else {
+                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            }
+        }
     }
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
+        monob = 0;
 
         
 }
