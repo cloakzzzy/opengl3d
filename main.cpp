@@ -1,14 +1,16 @@
 #define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <GL/glew.h>
 #include <glfw3.h>
 
 #include "libs/glm/glm.hpp"
 #include "libs/glm/gtc/matrix_transform.hpp"
 #include "libs/glm/gtc/type_ptr.hpp"
+#include "libs/stb_image_write.h"
 
 #include "Macros.hpp"
 #include "OtherAbstractions.hpp"
-#include "Utillities.hpp"
+#include "Depthshapes.hpp"
 
 #include "VBO.hpp"
 #include "VAO.hpp"
@@ -22,14 +24,26 @@
 #include <iostream>
 #include <vector>
 #include <thread>
+#include <cstring>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void processInput(GLFWwindow* window);
 
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned long SCR_WIDTH = 800;
+const unsigned long SCR_HEIGHT = 600;
+
+float s = 0.01f;
+
+void Crosshair(vector<float> &vertices) {
+    Gen_Quad(vertices, -0.005, 0.005, s, s);
+    Gen_Quad(vertices, 0.005, 0.005, s, s);
+    Gen_Quad(vertices, -0.005, -0.005, s, s);
+    Gen_Quad(vertices, -0.015, 0.005, s, s);
+    Gen_Quad(vertices, -0.005, 0.015, s, s);
+}
+
 unsigned int Frames = 0;
 Camera cam(SCR_WIDTH, SCR_HEIGHT, 90, float(SCR_WIDTH) / float(SCR_HEIGHT), 0.1, 100);
 Window win;
@@ -42,19 +56,22 @@ int main()
     win.Create(SCR_WIDTH, SCR_HEIGHT, "some aim trainer");
 
     glfwSwapInterval(0);
+    //glfwWindowHint(GLFW_SAMPLES, 4);
     glfwSetFramebufferSizeCallback(win.Object, framebuffer_size_callback);
     glfwSetCursorPosCallback(win.Object, mouse_callback);
     glfwSetMouseButtonCallback(win.Object, mouse_button_callback);
     glfwSetInputMode(win.Object, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    
 
     glewInit();
     glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_MULTISAMPLE); 
     shader.SetFiles("default.vert", "default.frag");
 
     float x = 0.05;
     float y = 0.05;
 
-    float s = 0.01f;
+    
     float th = 0.005;
 
 
@@ -106,14 +123,9 @@ int main()
 
     };
 
-    //crosshair
-    //Gen_Quad(vertices, -0.005, 0.005, s, s);
-    //Gen_Quad(vertices, 0.005, 0.005, s, s);
-    //Gen_Quad(vertices, -0.005, -0.005, s, s);
-    //Gen_Quad(vertices, -0.015, 0.005, s, s);
-    //Gen_Quad(vertices, -0.005, 0.015, s, s);
+    //Crosshair(vertices);
 
-    int acc = 40;
+    int acc = 40 ;
 
     // NOTE: shapes are placed in order of when i implemented the functions. Going from left to right.
 
@@ -147,7 +159,14 @@ int main()
 
     float xoff = 0.f;
     processInput(win.Object);
-    
+
+    cam.position.z += 3.0f;
+    int gd = 2;
+
+    int n = 0;
+
+    const unsigned int h = 50;
+
     win.MainLoop([&] {
         
         processInput(win.Object);
@@ -182,6 +201,23 @@ int main()
 
         glDrawArrays(GL_TRIANGLES, 0, vertices.size() / VAO1.VertexSize);
 
+        /*
+        n++;
+        string num = to_string(n);
+        string s = "frames/frames" + num + ".png";
+       
+        char const* name = s.c_str();  
+      
+        uint8_t* pixels = new uint8_t[SCR_WIDTH * SCR_HEIGHT * 3];
+
+        glReadPixels(0,0,SCR_WIDTH, SCR_HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+        
+        stbi_write_png(name, SCR_WIDTH, SCR_HEIGHT, 3, pixels, SCR_WIDTH * 3);
+        
+        
+        */
+   
+ 
         }, 0.53, 0.81, 0.92);
 
     VBO1.Delete();
