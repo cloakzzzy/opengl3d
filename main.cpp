@@ -1,7 +1,10 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
+#define CL_USE_DEPRECATED_OPENCL_1_2_APIS
+
 #include <GL/glew.h>
 #include <glfw3.h>
+#include <CL/opencl.h>
 
 #include "libs/glm/glm.hpp"
 #include "libs/glm/gtc/matrix_transform.hpp"
@@ -11,6 +14,7 @@
 #include "Macros.hpp"
 #include "OtherAbstractions.hpp"
 #include "Depthshapes.hpp"
+#include "Flatshapes.hpp"
 
 #include "VBO.hpp"
 #include "VAO.hpp"
@@ -25,11 +29,30 @@
 #include <vector>
 #include <thread>
 #include <cstring>
+#include<algorithm> // for copy() and assign() 
+#include<iterator> // for back_inserter 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void processInput(GLFWwindow* window);
+
+static std::string read_file(const char* fileName) {
+    std::fstream f;
+    f.open(fileName, std::ios_base::in);
+    assert(f.is_open());
+
+    std::string res;
+    while (!f.eof()) {
+        char c;
+        f.get(c);
+        res += c;
+    }
+
+    f.close();
+
+    return std::move(res);
+}
 
 const unsigned long SCR_WIDTH = 800;
 const unsigned long SCR_HEIGHT = 600;
@@ -52,6 +75,10 @@ Shader shader;
 
 int main()
 {
+    
+
+//=====================================================================
+
     glfwSetVersion(3, 3);
     win.Create(SCR_WIDTH, SCR_HEIGHT, "some aim trainer");
 
@@ -70,58 +97,9 @@ int main()
 
     float x = 0.05;
     float y = 0.05;
-
-    
     float th = 0.005;
 
-
-    vector <float> vertices = {
-        /*
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 1.0f,
-
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
-
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-
-        */
-
-    };
+    vector <float> vertices;
 
     //Crosshair(vertices);
 
@@ -129,12 +107,12 @@ int main()
 
     // NOTE: shapes are placed in order of when i implemented the functions. Going from left to right.
 
-    Gen_Ngonxy(vertices, acc, 0.f, 0.f, 0.0f, 2.0f);
+    //Gen_Ngonxy(vertices, acc, 0.f, 0.f, 0.0f, 2.0f);
     Gen_UVsphere(vertices, acc, 5.0f, 0.f, 0.f, 2.0f);
-    Gen_Cone(vertices, acc, 10.0f, -2.0f, 0.f, 2.0f, 4.0f);
-    Gen_Doughnut(vertices, acc, 15.0f, 0.f, 0.f, 2.0f, 1.5f);
-    Gen_Cylinder(vertices, acc, 20.0f, -2.0f, 0.f, 2.0f, 4.0f);
-    Gen_Ngonxy(vertices, acc, 24.0f, 0.f, 0.0f, 1.0f, 2.0f);
+    //Gen_Cone(vertices, acc, 10.0f, -2.0f, 0.f, 2.0f, 4.0f);
+    //Gen_Doughnut(vertices, acc, 15.0f, 0.f, 0.f, 2.0f, 1.5f);
+    //Gen_Cylinder(vertices, acc, 20.0f, -2.0f, 0.f, 2.0f, 4.0f);
+    //Gen_Ngonxy(vertices, acc, 24.0f, 0.f, 0.0f, 1.0f, 2.0f);
 
 
     VBO VBO1(vertices);
@@ -147,7 +125,7 @@ int main()
     VAO1.LinkVBO(VBO1, 6, 1, 2, 3);
     VAO1.LinkVBO(VBO1, 6, 2, 1, 5);
 
-    Texture texture("container.jpg");
+    Texture texture("checkgrid.png");
     shader.SetInt("texture1", texture.ID);
 
     shader.Use();
