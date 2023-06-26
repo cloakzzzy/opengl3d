@@ -10,10 +10,9 @@ void Gen_UVsphere(vector <float>& vert, int acc, float cx, float cy, float cz, f
 	int layers = int(ceil(acc / 2));
 	float sw = 1.0f / float(acc);
 	float sh = 1.0f / float(layers);
-	cout << sw << " " << sh << '\n';
-
+	
 	float th = 360.0f / float(acc);
-	for (int i = 1; i > -1; i--) {
+	for (int i = layers; i > -1; i--) {
 		vector<float> a = Ngonyz(cx, cy, cz, cx, cy + r, cz, th, i);
 		float rada = abs(cz - a[2]);
 		vector<float> b = Ngonyz(cx, cy, cz, cx, cy + r, cz, th, i + 1);
@@ -25,6 +24,7 @@ void Gen_UVsphere(vector <float>& vert, int acc, float cx, float cy, float cz, f
 			vector<float> pc = Ngonxz(cx, b[1], cz, cx, b[1], cz + radb, th, j);
 			vector<float> pd = Ngonxz(cx, b[1], cz, cx, b[1], cz + radb, th, j + 1);
 			
+			/*
 			//bottom left
 			cout << "Layer" << i << '\n';
 			cout << sw * float(j) << " " << sh * float(i) + sh << '\n';
@@ -32,6 +32,7 @@ void Gen_UVsphere(vector <float>& vert, int acc, float cx, float cy, float cz, f
 			cout << sw * float(j) << " " << sh * float(i) << '\n';
 			cout << sw * float(j) + sw << " " << sh * float(i) << '\n';
 			cout<<'\n';
+			*/
 			
 			
 			Gen_3dquad(vert, 
