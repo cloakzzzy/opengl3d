@@ -92,19 +92,25 @@ int main()
 
     float x = 0.05;
     float y = 0.05;
-    float th = 0.005;
-
+    
 
     vector <float> vertices;
-    vector<float> v(50 * 6);
     
-    
-    int acc = 200;
+    float acc = 100.0f;
+    vector<float> v(acc * 3 * 6);
+  
 
     cl_mem buffer = context.CreateBuffer(CL_MEM_READ_WRITE, v.size() * sizeof(float));
     queue.EnqueueWriteBuffer(buffer, &v[0], v.size() * sizeof(float), 0);
 
-    kernel.SetArgs(vector<const void*>{&buffer});
+    float cx = 2.0f;
+    float cy = 2.0f;
+    float cz = 2.0f;
+    float th = 360.f / acc;
+    cout << th << '\n';
+    float r = 2.0f;
+
+    kernel.SetArgs(vector<const void*>{&buffer, &th, &cx, &cy, &cz, &r});
 
     size_t globalWorkSize = 10000000;
     size_t localWorkSize = 10;
@@ -114,9 +120,8 @@ int main()
     queue.Finish();
     vertices.insert(vertices.end(), v.begin(), v.end());
 
-    for (int i = 0; i < vertices.size(); i++) {
-        cout << i <<" : "<< vertices[i] << '\n';
-    }
+    
+ 
 
 //====================================================================================================================================================
 
